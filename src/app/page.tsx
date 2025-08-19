@@ -1,9 +1,12 @@
 'use client';
-import Image from 'next/image';
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from "react";
 import { useRouter } from 'next/navigation';
-import { Mail, Lock } from 'lucide-react';
-import create from 'zustand';
+import { GradientCircle } from "@/components/custom/GradientCircle";
+import { InputField } from "@/components/custom/InputField";
+import { Lock, Mail } from "@/assets/icons/icons";
+import { create } from 'zustand';
+import { meetusVR } from "@/assets/imgs/meetusvr-word-logo.svg";
+import { ring } from "@/assets/imgs/meetusvr-ring.svg";
 
 // ---- Zustand store to hold basic auth state on client
 type User = { id: string | number; name: string } | null;
@@ -12,17 +15,48 @@ export const useAuthStore = create<AuthState>((set) => ({ user: null, setUser: (
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
-export default function LoginPage() {
+function DesignElements() {
+  return (
+    <div className="hidden lg:block absolute h-full right-0 overflow-clip top-0 w-[45%] min-w-[600px]">
+      {/* Main ring logo */}
+      <div className="absolute h-[600px] left-0 top-[50px] w-full">
+        <div className="relative h-full w-full flex items-center justify-center">
+          <div className="relative h-[85vh] w-[85vh]">
+            <img
+              src={ring}
+              alt="MeetusVR ring"
+              className="absolute inset-0 w-full h-full object-contain drop-shadow-2xl animate-float"
+              style={{
+                animation: 'float 6s ease-in-out infinite',
+              }}
+            />
+          </div>
+        </div>
+      </div>
+      
+      {/* MeetusVR Logo */}
+      <div className="absolute bottom-24 left-1/2 -translate-x-1/2">
+        <img
+          src={meetusVR}
+          alt="MeetusVR"
+          className="h-12 w-auto drop-shadow-lg"
+        />
+      </div>
+    </div>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const valid = useMemo(() => EMAIL_RE.test(email) && password.length > 0, [email, password]);
 
-  async function onSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     if (!valid) return;
@@ -37,82 +71,125 @@ export default function LoginPage() {
         const d = await res.json().catch(() => ({}));
         throw new Error(d.message || 'Login failed');
       }
-      // Optional: immediately fetch user info to show name on dashboard without reload
       const ui = await fetch('/api/user');
       if (ui.ok) {
         const data = await ui.json();
         setUser({ id: data.id, name: data.name });
       }
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main className="min-h-screen">
-      <div className="mx-auto grid min-h-screen max-w-7xl grid-cols-1 lg:grid-cols-2">
-        {/* Left: form */}
-        <section className="flex items-center px-6 py-12 lg:px-12">
-          <div className="w-full max-w-md">
-            <h1 className="text-5xl font-semibold tracking-tight text-black/80">Welcome back</h1>
-            <p className="mt-4 text-black/60">Step into our shopping metaverse for an unforgettable shopping experience</p>
+    <div className="absolute h-full left-0 overflow-clip top-0 w-full lg:w-[55%] flex items-center justify-center p-6 lg:p-10">
+      <div className="w-full max-w-[440px] flex flex-col gap-8 md:gap-9 items-center">
+        <div className="text-center">
+          <h1 className="text-[#1a1a1e] text-4xl sm:text-5xl lg:text-[56px] font-['ABeeZee:Regular',_sans-serif] mb-3 leading-tight">
+            Welcome back
+          </h1>
+          <p className="text-[#62626b] text-base sm:text-lg lg:text-[18px] font-['ABeeZee:Regular',_sans-serif] leading-[1.55] px-4">
+            Step into our shopping metaverse for an unforgettable shopping experience
+          </p>
+        </div>
 
-            <form onSubmit={onSubmit} className="mt-10 space-y-4">
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 opacity-60"><Mail size={18} /></span>
-                <input
-                  className="input pl-10"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); setError(null); }}
-                  type="email"
-                />
+        <form onSubmit={handleSubmit} className="w-full space-y-5">
+          <InputField
+            icon={<Mail className="w-5 h-5"/>}
+            placeholder="Email"
+            type="email"
+            value={email}
+            onChange={(value) => {
+              setEmail(value);
+              setError(null);
+            }}
+          />
+          <InputField
+            icon={<Lock className="w-5 h-5"/>}
+            placeholder="Password"
+            type="password"
+            value={password}
+            onChange={(value) => {
+              setPassword(value);
+              setError(null);
+            }}
+          />
+
+          {error && (
+            <p className="text-sm text-red-600 text-center">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={!valid || loading}
+            className="bg-[#9414ff] hover:bg-[#8312e6] transition-colors duration-200 relative rounded-lg shrink-0 w-full disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="flex flex-row items-center justify-center relative size-full">
+              <div className="box-border content-stretch flex gap-1 items-center justify-center px-5 py-3 relative w-full">
+                <div className="font-['ABeeZee:Regular',_sans-serif] leading-normal not-italic text-[#ffffff] text-[16px]">
+                  {loading ? 'Logging in…' : 'Login'}
+                </div>
               </div>
+            </div>
+          </button>
+        </form>
 
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 opacity-60"><Lock size={18} /></span>
-                <input
-                  className="input pl-10"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setError(null); }}
-                  type="password"
-                />
-              </div>
-
-              {error && (
-                <p className="text-sm text-red-600">{error}</p>
-              )}
-
-              <button type="submit" disabled={!valid || loading} className="btn btn-primary w-full">
-                {loading ? 'Logging in…' : 'Login'}
-              </button>
-
-              <p className="text-center text-xs text-black/50">Don&apos;t have an account? <span className="underline">Sign up</span></p>
-            </form>
-          </div>
-        </section>
-
-        {/* Right: artwork */}
-        <section className="relative hidden items-center justify-center lg:flex">
-          <div className="relative h-[60vh] w-[60vh]">
-            <Image
-              src="/meetusvr-ring.svg"
-              alt="MeetusVR ring"
-              fill
-              priority
-              className="object-contain drop-shadow-xl"
-            />
-          </div>
-          <div className="absolute bottom-16 text-5xl font-semibold tracking-wider text-black/70">meetus<span className="font-normal">VR</span></div>
-        </section>
+        <p className="text-[14px] text-[#62626b] font-['ABeeZee:Regular',_sans-serif] hover:text-[#1a1a1e] transition-colors duration-200 cursor-pointer">
+          Don't have an account? <span className="underline">Sign up</span>
+        </p>
       </div>
-    </main>
+    </div>
   );
 }
 
+export default function Login() {
+  return (
+    <div className="bg-gradient-to-br from-[#f0f2ff] via-[#f5f0ff] to-[#fff0f9] relative min-h-screen h-full w-full overflow-hidden">
+      {/* Background gradient circles with increased blur for smoothness */}
+      <GradientCircle
+        className="absolute left-[-5%] size-[90vh] top-[-20vh] opacity-80"
+        color="#9E77F6"
+        radius={1203.5}
+        blur={500}
+      />
+      <GradientCircle
+        className="absolute left-[-10%] size-[95vh] bottom-[-30vh] opacity-70"
+        color="#B0D2E5"
+        radius={1206.5}
+        blur={500}
+      />
+      <GradientCircle
+        className="absolute size-[80vh] bottom-[-20vh] right-[-10%] opacity-80"
+        color="#9E77F6"
+        radius={733.5}
+        blur={300}
+      />
+      <GradientCircle
+        className="absolute size-[75vh] top-[-15vh] right-[20%] opacity-70"
+        color="#E477F6"
+        radius={733.5}
+        blur={300}
+      />
 
+      {/* Main container with improved glass effect */}
+      <div className="absolute backdrop-blur-md backdrop-filter bg-[rgba(255,255,255,0.25)] min-h-screen h-full w-full sm:h-[95vh] sm:w-[95vw] sm:max-w-[1440px] sm:min-h-[800px] sm:m-auto sm:inset-0 sm:rounded-[30px]">
+        <div className="h-[1024px] overflow-clip relative w-[1440px]">
+          <DesignElements />
+          <LoginForm />
+        </div>
+        <div
+          aria-hidden="true"
+          className="absolute border-[#ffffff] border-[2.5px] border-solid inset-0 pointer-events-none rounded-[20px]"
+        />
+      </div>
+    </div>
+  );
+}
 
