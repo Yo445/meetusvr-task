@@ -3,6 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --bg-grad-start: #f3f2ff; /* soft lilac */
+  --bg-grad-end: #f6d6ff; /* pinkish */
 }
 
 @theme inline {
@@ -23,4 +25,22 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+html,
+body,
+#__next {
+  height: 100%;
+}
+body {
+  @apply antialiased bg-gradient-to-br from-[var(--bg-grad-start)] to-[var(--bg-grad-end)];
+}
+
+/* Glass card */
+.glass {
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
