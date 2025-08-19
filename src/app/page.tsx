@@ -5,8 +5,7 @@ import { GradientCircle } from "@/components/custom/GradientCircle";
 import { InputField } from "@/components/custom/InputField";
 import { Lock, Mail } from "@/assets/icons/icons";
 import { create } from 'zustand';
-import { meetusVR } from "@/assets/imgs/meetusvr-word-logo.svg";
-import { ring } from "@/assets/imgs/meetusvr-ring.svg";
+import Image from 'next/image';
 
 // ---- Zustand store to hold basic auth state on client
 type User = { id: string | number; name: string } | null;
@@ -17,30 +16,29 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
 function DesignElements() {
   return (
-    <div className="hidden lg:block absolute h-full right-0 overflow-clip top-0 w-[45%] min-w-[600px]">
-      {/* Main ring logo */}
-      <div className="absolute h-[600px] left-0 top-[50px] w-full">
-        <div className="relative h-full w-full flex items-center justify-center">
-          <div className="relative h-[85vh] w-[85vh]">
-            <img
-              src={ring}
-              alt="MeetusVR ring"
-              className="absolute inset-0 w-full h-full object-contain drop-shadow-2xl animate-float"
-              style={{
-                animation: 'float 6s ease-in-out infinite',
-              }}
-            />
-          </div>
+    <div className="hidden lg:flex absolute h-full right-0 top-0 w-[45%] items-center justify-center overflow-hidden">
+      <div className="relative w-full max-w-[800px] aspect-square flex flex-col items-center justify-center px-8">
+        {/* Main ring logo */}
+        <div className="relative w-full aspect-square">
+          <Image
+            src="/meetusvr-ring.svg"
+            alt="MeetusVR ring"
+            fill
+            priority
+            className="object-contain drop-shadow-2xl"
+          />
         </div>
-      </div>
-      
-      {/* MeetusVR Logo */}
-      <div className="absolute bottom-24 left-1/2 -translate-x-1/2">
-        <img
-          src={meetusVR}
-          alt="MeetusVR"
-          className="h-12 w-auto drop-shadow-lg"
-        />
+        
+        {/* MeetusVR Logo */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+          <Image
+            src="/meetusvr-word-logo.svg"
+            alt="MeetusVR"
+            width={200}
+            height={48}
+            className="drop-shadow-lg"
+          />
+        </div>
       </div>
     </div>
   );
@@ -89,13 +87,13 @@ function LoginForm() {
   }
 
   return (
-    <div className="absolute h-full left-0 overflow-clip top-0 w-full lg:w-[55%] flex items-center justify-center p-6 lg:p-10">
-      <div className="w-full max-w-[440px] flex flex-col gap-8 md:gap-9 items-center">
-        <div className="text-center">
-          <h1 className="text-[#1a1a1e] text-4xl sm:text-5xl lg:text-[56px] font-['ABeeZee:Regular',_sans-serif] mb-3 leading-tight">
+    <div className="relative h-full w-full lg:w-[55%] flex items-center justify-center p-4 sm:p-6 lg:p-10">
+      <div className="w-full max-w-[440px] flex flex-col gap-6 sm:gap-8 items-center">
+        <div className="text-center w-full">
+          <h1 className="text-[#1a1a1e] text-3xl sm:text-4xl lg:text-5xl font-medium mb-3 leading-tight">
             Welcome back
           </h1>
-          <p className="text-[#62626b] text-base sm:text-lg lg:text-[18px] font-['ABeeZee:Regular',_sans-serif] leading-[1.55] px-4">
+          <p className="text-[#62626b] text-sm sm:text-base lg:text-lg leading-relaxed max-w-[90%] mx-auto">
             Step into our shopping metaverse for an unforgettable shopping experience
           </p>
         </div>
@@ -179,15 +177,13 @@ export default function Login() {
       />
 
       {/* Main container with improved glass effect */}
-      <div className="absolute backdrop-blur-md backdrop-filter bg-[rgba(255,255,255,0.25)] min-h-screen h-full w-full sm:h-[95vh] sm:w-[95vw] sm:max-w-[1440px] sm:min-h-[800px] sm:m-auto sm:inset-0 sm:rounded-[30px]">
-        <div className="h-[1024px] overflow-clip relative w-[1440px]">
-          <DesignElements />
-          <LoginForm />
+      <div className="relative mx-auto my-0 sm:my-4 lg:my-6 w-full sm:w-[95%] max-w-[1440px] min-h-[100vh] sm:min-h-[800px] sm:h-[95vh] overflow-hidden">
+        <div className="absolute inset-0 backdrop-blur-md bg-[rgba(255,255,255,0.25)] sm:rounded-[30px] border border-white/20">
+          <div className="relative w-full h-full flex flex-col lg:flex-row">
+            <LoginForm />
+            <DesignElements />
+          </div>
         </div>
-        <div
-          aria-hidden="true"
-          className="absolute border-[#ffffff] border-[2.5px] border-solid inset-0 pointer-events-none rounded-[20px]"
-        />
       </div>
     </div>
   );
