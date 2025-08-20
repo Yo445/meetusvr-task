@@ -3,19 +3,23 @@ import { NextRequest, NextResponse } from 'next/server';
 export function middleware(req: NextRequest) {
   const token = req.cookies.get('access_token');
   const isAuthed = Boolean(token?.value);
-  const { pathname } = req.nextUrl;
+  const pathname = req.nextUrl.pathname;
 
-  // Handle root path (login page)
-  if (pathname === '/') {
-    if (isAuthed) {
-      const url = new URL('/dashboard', req.url);
-      return NextResponse.redirect(url);
-    }
+  // Skip middleware for static files and API routes
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/static') ||
+    pathname.startsWith('/images') ||
+    pathname.startsWith('/api/login')
+  ) {
     return NextResponse.next();
   }
 
-  // Public API routes
-  if (pathname === '/api/login') {
+  // Handle authentication routes
+  if (pathname === '/') {
+    if (isAuthed) {
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
     return NextResponse.next();
   }
 
@@ -27,10 +31,9 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Protected page routes (everything else except public assets)
-  if (!isAuthed) {
-    const url = new URL('/', req.url);
-    return NextResponse.redirect(url);
+  // Protected routes
+  if (!isAuthed && pathname !== '/') {
+    return NextResponse.redirect(new URL('/', req.url));
   }
 
   return NextResponse.next();

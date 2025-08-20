@@ -15,7 +15,3 @@ export interface AuthResponse {
   userInfo: UserInfo;
 }
 
-export interface ApiError {
-  message: string;
-  status?: number;
-}

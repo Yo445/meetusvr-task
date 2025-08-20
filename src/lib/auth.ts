@@ -1,9 +1,8 @@
-'use server';
+
 import { cookies } from 'next/headers';
-
-
 import { z } from 'zod';
 import { AuthResponse } from './types';
+import { API_URL } from "@/constant";
 
 const TOKEN_COOKIE = 'access_token';
 const REFRESH_TOKEN_COOKIE = 'refresh_token';
@@ -21,7 +20,7 @@ export async function login(data: LoginInput): Promise<{ success: boolean; error
     // Validate input
     const validated = loginSchema.parse(data);
 
-    const res = await fetch("https://api-yeshtery.dev.meetusvr.com/v1/yeshtery/token", {
+    const res = await fetch(`${API_URL}/yeshtery/token`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...validated, isEmployee: true }),

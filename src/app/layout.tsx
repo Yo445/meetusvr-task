@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ABeeZee } from "next/font/google";
 import "./globals.css";
+import { Providers } from "@/redux/providers";
 
 const abeezee = ABeeZee({
   weight: ["400"],
@@ -22,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${abeezee.variable} antialiased`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAuthCookie, getUserInfo } from '@/lib/auth';
+import { API_URL } from "@/constant";
 
 export async function GET() {
   try {
@@ -15,7 +16,7 @@ export async function GET() {
     }
 
     // If no cached user, fetch from API
-    const res = await fetch('https://api-yeshtery.dev.meetusvr.com/v1/user/info', {
+    const res = await fetch(`${API_URL}/user/info`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
