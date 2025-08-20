@@ -1,4 +1,4 @@
-# MeetusVR Authentication System  <a href='https://meetusvr-task.vercel.app/'>Live Demo</a>
+# MeetusVR Authentication System  <a href='https://meetusvr-task.vercel.app/'>Live Demo -></a>
 
 ### <a href='https://www.figma.com/design/YCGygs0ShSq3Qxa5kpvYaB/Untitled?node-id=0-16&t=Rydt8IYREbexYAyv-0'>Figma design</a>
 
