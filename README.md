@@ -2,6 +2,7 @@
 
 ### <a href='https://www.figma.com/design/YCGygs0ShSq3Qxa5kpvYaB/Untitled?node-id=0-16&t=Rydt8IYREbexYAyv-0'><- Figma design -></a>
 
+https://github.com/user-attachments/assets/b387fbf6-12fe-4f6e-8cb3-164965ee0874
 
 ## Login Page
 <img width="1918" height="977" alt="image" src="https://github.com/user-attachments/assets/8abf5142-d878-4870-a8c3-c275793ed4cf" />
