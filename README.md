@@ -1,29 +1,102 @@
-# MeetusVR Auth App
+# MeetusVR Authentication System
+
+A secure authentication system built with Next.js 14, featuring protected routes, form validation, and secure token management.
+
+## Features
+
+- **Secure Authentication:**
+  - Email and password validation using Zod
+  - HTTP-only cookies for token storage
+  - Protected routes with middleware
+  - Automatic redirects based on auth status
+
+- **User Management:**
+  - Secure user information retrieval
+  - Caching for better performance
+  - Token-based API authentication
+  - Proper error handling
+
+- **Route Protection:**
+  - Smart routing based on authentication status
+  - Protected dashboard and API endpoints
+  - Public login page with auth check
+  - Secure logout mechanism
+
+## Technical Implementation
+
+### Authentication Flow
+
+1. **Login Process:**
+   - Form validation with Zod schema
+   - Secure token storage in HTTP-only cookies
+   - Automatic redirect to dashboard on success
+
+2. **Route Protection:**
+   - Middleware checks auth status
+   - Redirects unauthenticated users to login
+   - Redirects authenticated users away from login
+   - Protected API endpoints
+
+3. **User Information:**
+   - Cached user data for performance
+   - Secure API calls with bearer token
+   - Proper error handling and status codes
 
 
-Next.js 14 (App Router) + Tailwind + Zustand + Axios. Implements the assignment:
+## Key Components Explained
 
+### 1. User API (`/api/user/route.ts`)
+```typescript
+// Fetches user information with caching
+export async function GET() {
+  const token = await getAuthCookie();
+  // Try cache first
+  const cachedUser = await getUserInfo();
+  if (cachedUser) return NextResponse.json(cachedUser);
+  // Fallback to API
+  const res = await fetch('api/user/info', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+}
+```
 
-- Figma-inspired login page
-- Validation (email + password required); login disabled until valid
-- Calls token API and stores `token` in **HTTP-only** cookie via Next route handler
-- Fetches user name/ID via proxy API using `Authorization: Bearer <token>`
-- Protected `/dashboard` with middleware; shows ID/Name and a Logout button
-- Logout clears the cookie and redirects back to login
+### 2. Middleware (`middleware.ts`)
+```typescript
+// Smart route protection
+if (pathname === '/') {
+  if (isAuthed) {
+    return NextResponse.redirect(new URL('/dashboard', req.url));
+  }
+}
+// Protect all non-public routes
+if (!isAuthed) {
+  return NextResponse.redirect(new URL('/', req.url));
+}
+```
 
+## Getting Started
 
-## Run locally
-
-
+1. Install dependencies:
 ```bash
-pnpm i # or npm i / yarn
+pnpm install
+```
+
+2. Start development server:
+```bash
 pnpm dev # http://localhost:3000
 ```
 
+## Test Credentials
+```
+Email: dev.aert@gmail.com
+Password: helloworld
+```
 
-> Test credentials: `dev.aert@gmail.com` / `helloworld`
+## Security Notes
 
-
-## Notes
-- We avoid handling refresh tokens explicitly; if the backend returns 401 we redirect to login and clear the cookie.
-- Styling uses Tailwind; swap `/public/meetusvr-ring.svg` with the asset exported from Figma to better match the design.
+- HTTP-only cookies prevent XSS attacks
+- Protected routes with middleware
+- Proper error handling and status codes
+- Token validation on all protected routes
+- No client-side token storage
+- Automatic auth state management

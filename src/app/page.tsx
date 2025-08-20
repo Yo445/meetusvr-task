@@ -1,71 +1,66 @@
 "use client";
-import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { InputField } from "@/components/custom/InputField";
+import { InputField } from "@/components/InputField";
 import { Lock, Mail } from "@/assets/icons/icons";
 import { useAuthStore } from "@/store/auth";
+import { login } from "@/lib/auth";
 import Image from "next/image";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+// Define the login form schema with Zod
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(6, "Password must be at least 6 characters"),
+});
+
+// Type for our form data based on the schema
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  
+  const {
+    handleSubmit,
+    formState: { errors, isSubmitting, isValid },
+    register,
+    setError: setFormError,
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: "onChange",
+  });
 
-  const isValid = useMemo(
-    () => EMAIL_RE.test(email) && password.length > 0,
-    [email, password]
-  );
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    if (!isValid) return;
-    setLoading(true);
-
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || "Login failed");
+      const result = await login(data);
+      
+      if (!result.success) {
+        throw new Error(result.error);
       }
 
-      const userInfo = await fetch("/api/user");
-      if (userInfo.ok) {
-        const data = await userInfo.json();
-        setUser({ id: data.id, name: data.name });
-        // Add a small delay for better UX transition
-        setTimeout(() => {
-          router.push("/dashboard");
-          router.refresh(); // Ensure dashboard gets fresh data
-        }, 300);
-      } else {
-        throw new Error("Failed to fetch user info");
-      }
+      // No need to fetch user info separately as it's now stored in cookies
+      router.push("/dashboard");
+      router.refresh(); // Ensure dashboard gets fresh data
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An unexpected error occurred"
-      );
-      setLoading(false);
+      setFormError("root", { 
+        type: "manual",
+        message: err instanceof Error ? err.message : "An unexpected error occurred"
+      });
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-[#e6eafc] via-[#ede3fa] to-[#f5d6ff]">
       {/* Left: Form Section */}
       <div className="flex flex-1 items-center justify-center pl-8 pr-4 sm:pl-12 sm:pr-6 lg:pl-20 lg:pr-10">
-        <form onSubmit={handleLogin} className="w-full max-w-md space-y-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md space-y-8">
           {/* Heading */}
-          <div>
+          <div className="text-center">
             <h1 className="text-[#1a1a1e] text-4xl sm:text-5xl lg:text-[56px] font-medium mb-3 leading-[1.15]">
               Welcome back
             </h1>
@@ -77,43 +72,51 @@ export default function Login() {
 
           {/* Input Fields */}
           <div className="space-y-4">
-            <InputField
-              icon={<Mail className="w-[22px] h-[22px] text-[#62626b]" />}
-              placeholder="Email"
-              type="email"
-              value={email}
-              onChange={(value) => {
-                setEmail(value);
-                setError(null);
-              }}
-            />
-            <InputField
-              icon={<Lock className="w-[22px] h-[22px] text-[#62626b]" />}
-              placeholder="Password"
-              type="password"
-              value={password}
-              onChange={(value) => {
-                setPassword(value);
-                setError(null);
-              }}
-            />
-            {error && (
-              <p className="text-sm text-red-600 text-center mt-2">{error}</p>
+            <div>
+              <InputField
+                icon={<Mail className="w-[22px] h-[22px] text-[#62626b]" />}
+                placeholder="Email"
+                type="email"
+                error={errors.email?.message}
+                {...register("email")}
+              />
+              {errors.email && (
+                <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <InputField
+                icon={<Lock className="w-[22px] h-[22px] text-[#62626b]" />}
+                placeholder="Password"
+                type="password"
+                error={errors.password?.message}
+                {...register("password")}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-600 mt-1">{errors.password.message}</p>
+              )}
+            </div>
+
+            {errors.root && (
+              <p className="text-sm text-red-600 text-center mt-2">
+                {errors.root.message}
+              </p>
             )}
           </div>
 
           {/* Login Button */}
           <button
             type="submit"
-            disabled={!isValid || loading}
+            disabled={!isValid || isSubmitting}
             className="h-[48px] w-full flex items-center justify-center rounded-lg bg-gradient-to-r from-[#9414ff] to-[#d414ff] hover:opacity-90 text-white text-[16px] font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Logging in…" : "Login"}
+            {isSubmitting ? "Logging in…" : "Login"}
           </button>
 
           {/* Sign up link */}
           <p className="text-center text-sm text-[#62626b]">
-            Don’t have an account?{" "}
+            Don't have an account?{" "}
             <span className="text-[#9414ff] hover:text-[#8312e6] underline font-medium cursor-pointer">
               Sign up
             </span>
