@@ -1,7 +1,11 @@
 # MeetusVR Authentication System
-<a href='https://meetusvr-task.vercel.app/'>Live Demo</a>
+
+- **<a href='https://meetusvr-task.vercel.app/'>Live Demo</a>**
+
 <img width="1918" height="977" alt="image" src="https://github.com/user-attachments/assets/8abf5142-d878-4870-a8c3-c275793ed4cf" />
 <img width="1917" height="971" alt="image" src="https://github.com/user-attachments/assets/0b844e1b-4c47-4846-a82e-dd0f04528524" />
+<img width="1758" height="932" alt="image" src="https://github.com/user-attachments/assets/61f99eb4-0011-4cff-bee6-b406ee66707e" />
+
 
 A secure authentication system built with Next.js 14, featuring protected routes, form validation, and secure token management.
 
