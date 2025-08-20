@@ -8,9 +8,21 @@ interface InputFieldProps {
   onChange?: (value: string) => void;
 }
 
-export function InputField({ icon, placeholder, type = 'text', value, onChange }: InputFieldProps) {
+export function InputField({
+  icon,
+  placeholder,
+  type = 'text',
+  value,
+  onChange,
+}: InputFieldProps) {
+  const isFilled = Boolean(value && value.trim().length > 0);
+
   return (
-    <div className="bg-[rgba(255,255,255,0.4)] relative rounded-lg shrink-0 w-full">
+    <div
+      className={`relative rounded-lg shrink-0 w-full ${
+        isFilled ? 'bg-[#e9f0fe]' : 'bg-[rgba(255,255,255,0.4)]'
+      }`}
+    >
       <div
         aria-hidden="true"
         className="absolute border border-[#ffffff] border-solid inset-0 pointer-events-none rounded-lg"

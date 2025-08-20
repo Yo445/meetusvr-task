@@ -1,50 +1,14 @@
-'use client';
-import React, { useState, useMemo } from "react";
-import { useRouter } from 'next/navigation';
-import { GradientCircle } from "@/components/custom/GradientCircle";
+"use client";
+import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { InputField } from "@/components/custom/InputField";
 import { Lock, Mail } from "@/assets/icons/icons";
-import { create } from 'zustand';
-import Image from 'next/image';
-
-// ---- Zustand store to hold basic auth state on client
-type User = { id: string | number; name: string } | null;
-interface AuthState { user: User; setUser: (u: User) => void }
-export const useAuthStore = create<AuthState>((set) => ({ user: null, setUser: (u) => set({ user: u }) }));
+import { useAuthStore } from "@/store/auth";
+import Image from "next/image";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
-function DesignElements() {
-  return (
-    <div className="hidden lg:flex absolute h-full right-0 top-0 w-[45%] items-center justify-center overflow-hidden">
-      <div className="relative w-full max-w-[800px] aspect-square flex flex-col items-center justify-center px-8">
-        {/* Main ring logo */}
-        <div className="relative w-full aspect-square">
-          <Image
-            src="/meetusvr-ring.svg"
-            alt="MeetusVR ring"
-            fill
-            priority
-            className="object-contain drop-shadow-2xl"
-          />
-        </div>
-        
-        {/* MeetusVR Logo */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-          <Image
-            src="/meetusvr-word-logo.svg"
-            alt="MeetusVR"
-            width={200}
-            height={48}
-            className="drop-shadow-lg"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function LoginForm() {
+export default function Login() {
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
   const [email, setEmail] = useState("");
@@ -52,140 +16,133 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const valid = useMemo(() => EMAIL_RE.test(email) && password.length > 0, [email, password]);
+  const isValid = useMemo(
+    () => EMAIL_RE.test(email) && password.length > 0,
+    [email, password]
+  );
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!valid) return;
+    if (!isValid) return;
     setLoading(true);
+
     try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
       });
+
       if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.message || 'Login failed');
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "Login failed");
       }
-      const ui = await fetch('/api/user');
-      if (ui.ok) {
-        const data = await ui.json();
+
+      const userInfo = await fetch("/api/user");
+      if (userInfo.ok) {
+        const data = await userInfo.json();
         setUser({ id: data.id, name: data.name });
-      }
-      router.push('/dashboard');
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+        // Add a small delay for better UX transition
+        setTimeout(() => {
+          router.push("/dashboard");
+          router.refresh(); // Ensure dashboard gets fresh data
+        }, 300);
       } else {
-        setError('An unexpected error occurred');
+        throw new Error("Failed to fetch user info");
       }
-    } finally {
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred"
+      );
       setLoading(false);
     }
   }
 
   return (
-    <div className="relative h-full w-full lg:w-[55%] flex items-center justify-center p-4 sm:p-6 lg:p-10">
-      <div className="w-full max-w-[440px] flex flex-col gap-6 sm:gap-8 items-center">
-        <div className="text-center w-full">
-          <h1 className="text-[#1a1a1e] text-3xl sm:text-4xl lg:text-5xl font-medium mb-3 leading-tight">
-            Welcome back
-          </h1>
-          <p className="text-[#62626b] text-sm sm:text-base lg:text-lg leading-relaxed max-w-[90%] mx-auto">
-            Step into our shopping metaverse for an unforgettable shopping experience
-          </p>
-        </div>
+    <div className="flex min-h-screen bg-gradient-to-br from-[#e6eafc] via-[#ede3fa] to-[#f5d6ff]">
+      {/* Left: Form Section */}
+      <div className="flex flex-1 items-center justify-center pl-8 pr-4 sm:pl-12 sm:pr-6 lg:pl-20 lg:pr-10">
+        <form onSubmit={handleLogin} className="w-full max-w-md space-y-8">
+          {/* Heading */}
+          <div>
+            <h1 className="text-[#1a1a1e] text-4xl sm:text-5xl lg:text-[56px] font-medium mb-3 leading-[1.15]">
+              Welcome back
+            </h1>
+            <p className="text-[#62626b] text-base sm:text-lg leading-relaxed max-w-sm">
+              Step into our shopping metaverse for an unforgettable shopping
+              experience
+            </p>
+          </div>
 
-        <form onSubmit={handleSubmit} className="w-full space-y-5">
-          <InputField
-            icon={<Mail className="w-5 h-5"/>}
-            placeholder="Email"
-            type="email"
-            value={email}
-            onChange={(value) => {
-              setEmail(value);
-              setError(null);
-            }}
-          />
-          <InputField
-            icon={<Lock className="w-5 h-5"/>}
-            placeholder="Password"
-            type="password"
-            value={password}
-            onChange={(value) => {
-              setPassword(value);
-              setError(null);
-            }}
-          />
+          {/* Input Fields */}
+          <div className="space-y-4">
+            <InputField
+              icon={<Mail className="w-[22px] h-[22px] text-[#62626b]" />}
+              placeholder="Email"
+              type="email"
+              value={email}
+              onChange={(value) => {
+                setEmail(value);
+                setError(null);
+              }}
+            />
+            <InputField
+              icon={<Lock className="w-[22px] h-[22px] text-[#62626b]" />}
+              placeholder="Password"
+              type="password"
+              value={password}
+              onChange={(value) => {
+                setPassword(value);
+                setError(null);
+              }}
+            />
+            {error && (
+              <p className="text-sm text-red-600 text-center mt-2">{error}</p>
+            )}
+          </div>
 
-          {error && (
-            <p className="text-sm text-red-600 text-center">{error}</p>
-          )}
-
+          {/* Login Button */}
           <button
             type="submit"
-            disabled={!valid || loading}
-            className="bg-[#9414ff] hover:bg-[#8312e6] transition-colors duration-200 relative rounded-lg shrink-0 w-full disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!isValid || loading}
+            className="h-[48px] w-full flex items-center justify-center rounded-lg bg-gradient-to-r from-[#9414ff] to-[#d414ff] hover:opacity-90 text-white text-[16px] font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <div className="flex flex-row items-center justify-center relative size-full">
-              <div className="box-border content-stretch flex gap-1 items-center justify-center px-5 py-3 relative w-full">
-                <div className="font-['ABeeZee:Regular',_sans-serif] leading-normal not-italic text-[#ffffff] text-[16px]">
-                  {loading ? 'Logging in…' : 'Login'}
-                </div>
-              </div>
-            </div>
+            {loading ? "Logging in…" : "Login"}
           </button>
+
+          {/* Sign up link */}
+          <p className="text-center text-sm text-[#62626b]">
+            Don’t have an account?{" "}
+            <span className="text-[#9414ff] hover:text-[#8312e6] underline font-medium cursor-pointer">
+              Sign up
+            </span>
+          </p>
         </form>
-
-        <p className="text-[14px] text-[#62626b] font-['ABeeZee:Regular',_sans-serif] hover:text-[#1a1a1e] transition-colors duration-200 cursor-pointer">
-          Don't have an account? <span className="underline">Sign up</span>
-        </p>
       </div>
-    </div>
-  );
-}
 
-export default function Login() {
-  return (
-    <div className="bg-gradient-to-br from-[#f0f2ff] via-[#f5f0ff] to-[#fff0f9] relative min-h-screen h-full w-full overflow-hidden">
-      {/* Background gradient circles with increased blur for smoothness */}
-      <GradientCircle
-        className="absolute left-[-5%] size-[90vh] top-[-20vh] opacity-80"
-        color="#9E77F6"
-        radius={1203.5}
-        blur={500}
-      />
-      <GradientCircle
-        className="absolute left-[-10%] size-[95vh] bottom-[-30vh] opacity-70"
-        color="#B0D2E5"
-        radius={1206.5}
-        blur={500}
-      />
-      <GradientCircle
-        className="absolute size-[80vh] bottom-[-20vh] right-[-10%] opacity-80"
-        color="#9E77F6"
-        radius={733.5}
-        blur={300}
-      />
-      <GradientCircle
-        className="absolute size-[75vh] top-[-15vh] right-[20%] opacity-70"
-        color="#E477F6"
-        radius={733.5}
-        blur={300}
-      />
+      {/* Right: Image Section */}
+      <div className="hidden lg:flex flex-1 flex-col items-center justify-center pl-4 pr-8 lg:pl-10 lg:pr-20">
+        <div className="w-full max-w-[850px]">
+          <Image
+            src="/meetusvr-ring.svg"
+            alt="MeetusVR ring"
+            width={850}
+            height={850}
+            priority
+            className="w-full h-auto object-contain"
+          />
+        </div>
 
-      {/* Main container with improved glass effect */}
-      <div className="relative mx-auto my-0 sm:my-4 lg:my-6 w-full sm:w-[95%] max-w-[1440px] min-h-[100vh] sm:min-h-[800px] sm:h-[95vh] overflow-hidden">
-        <div className="absolute inset-0 backdrop-blur-md bg-[rgba(255,255,255,0.25)] sm:rounded-[30px] border border-white/20">
-          <div className="relative w-full h-full flex flex-col lg:flex-row">
-            <LoginForm />
-            <DesignElements />
-          </div>
+        <div className="relative w-[413px] h-[70px] mt-8">
+          <Image
+            src="/meetusvr-word-logo.svg"
+            alt="MeetusVR"
+            fill
+            style={{ objectFit: "contain" }}
+          />
         </div>
       </div>
     </div>
   );
 }
-

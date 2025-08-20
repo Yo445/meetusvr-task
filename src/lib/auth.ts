@@ -1,7 +1,7 @@
 'use server';
 import { cookies } from 'next/headers';
 
-export const TOKEN_COOKIE = 'access_token';
+const TOKEN_COOKIE = 'access_token'; // ✅ no export
 
 export async function setAuthCookie(token: string) {
   const cookieStore = await cookies();

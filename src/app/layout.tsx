@@ -1,21 +1,17 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { ABeeZee } from "next/font/google";
 import "./globals.css";
-import "./animations.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const abeezee = ABeeZee({
+  weight: ["400"],
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-abeezee",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-title: 'MeetusVR Auth',
-description: 'Login → Dashboard (Next.js + Zustand)'
+  title: "MeetusVR Auth",
+  description: "Login → Dashboard (Next.js + Zustand)",
 };
 
 export default function RootLayout({
@@ -25,9 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${abeezee.variable} antialiased`}>
         {children}
       </body>
     </html>
