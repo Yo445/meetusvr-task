@@ -1,6 +1,6 @@
 # MeetusVR Authentication System
 
-- *<a href='https://meetusvr-task.vercel.app/'>Live Demo</a>*
+### <a href='https://meetusvr-task.vercel.app/'>Live Demo</a>
 
 - **Login Page**
 <img width="1918" height="977" alt="image" src="https://github.com/user-attachments/assets/8abf5142-d878-4870-a8c3-c275793ed4cf" />
