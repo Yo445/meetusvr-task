@@ -4,13 +4,12 @@ import { getAuthCookie } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOut, User, Settings, Activity } from "lucide-react";
+import { LogOut } from "lucide-react";
 
 async function getUser() {
   try {
@@ -27,7 +26,7 @@ async function getUser() {
       try {
         return JSON.parse(userInfoStr);
       } catch (e) {
-        console.error("Failed to parse user info from cookie");
+        console.error("Failed to parse user info from cookie", e);
       }
     }
 

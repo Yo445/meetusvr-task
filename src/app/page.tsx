@@ -2,7 +2,6 @@
 import { useRouter } from "next/navigation";
 import { InputField } from "@/components/InputField";
 import { Lock, Mail } from "@/assets/icons/icons";
-import { useAuthStore } from "@/store/auth";
 import { login } from "@/lib/auth";
 import Image from "next/image";
 import { z } from "zod";
@@ -23,7 +22,6 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const router = useRouter();
-  const setUser = useAuthStore((s) => s.setUser);
   
   const {
     handleSubmit,
@@ -116,7 +114,7 @@ export default function Login() {
 
           {/* Sign up link */}
           <p className="text-center text-sm text-[#62626b]">
-            Don't have an account?{" "}
+            Don&apos;t have an account?
             <span className="text-[#9414ff] hover:text-[#8312e6] underline font-medium cursor-pointer">
               Sign up
             </span>

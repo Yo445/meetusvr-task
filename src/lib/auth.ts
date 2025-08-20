@@ -1,14 +1,9 @@
 'use server';
 import { cookies } from 'next/headers';
 
-const COOKIE_OPTIONS = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax' as const,
-  path: '/',
-};
+
 import { z } from 'zod';
-import { AuthResponse, ApiError } from './types';
+import { AuthResponse } from './types';
 
 const TOKEN_COOKIE = 'access_token';
 const REFRESH_TOKEN_COOKIE = 'refresh_token';
