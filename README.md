@@ -14,7 +14,7 @@ https://github.com/user-attachments/assets/c3588743-3848-4aea-ab4c-d757faa2963f
 <img width="1758" height="932" alt="image" src="https://github.com/user-attachments/assets/61f99eb4-0011-4cff-bee6-b406ee66707e" />
 
 
-A secure authentication system built with Next.js 14, featuring protected routes, form validation, and secure token management.
+A secure authentication system built with Next.js, featuring protected routes, form validation, and secure token management.
 
 ## Features
 
