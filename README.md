@@ -2,6 +2,7 @@
 
 ### <a href='https://www.figma.com/design/YCGygs0ShSq3Qxa5kpvYaB/Untitled?node-id=0-16&t=Rydt8IYREbexYAyv-0'><- Figma design -></a>
 
+https://github.com/user-attachments/assets/c3588743-3848-4aea-ab4c-d757faa2963f
 
 ## Login Page
 <img width="1918" height="977" alt="image" src="https://github.com/user-attachments/assets/8abf5142-d878-4870-a8c3-c275793ed4cf" />
@@ -13,7 +14,7 @@
 <img width="1758" height="932" alt="image" src="https://github.com/user-attachments/assets/61f99eb4-0011-4cff-bee6-b406ee66707e" />
 
 
-A secure authentication system built with Next.js 14, featuring protected routes, form validation, and secure token management.
+A secure authentication system built with Next.js, featuring protected routes, form validation, and secure token management.
 
 ## Features
 
