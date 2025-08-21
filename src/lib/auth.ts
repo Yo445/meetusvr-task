@@ -1,21 +1,17 @@
-
+'use server';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { AuthResponse } from './types';
 import { API_URL } from "@/constant";
+import { LoginFormData, loginSchema } from "@/schema/auth";
 
 const TOKEN_COOKIE = 'access_token';
 const REFRESH_TOKEN_COOKIE = 'refresh_token';
 const USER_COOKIE = 'user_info';
 
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
 
-export type LoginInput = z.infer<typeof loginSchema>;
 
-export async function login(data: LoginInput): Promise<{ success: boolean; error?: string }> {
+export async function login(data: LoginFormData): Promise<{ success: boolean; error?: string }> {
   try {
     // Validate input
     const validated = loginSchema.parse(data);
